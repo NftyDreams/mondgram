@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Mondgram</title>
+
+    <style>
+        html {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        * {
+            font-size: 18px;
+        }
+
+        button {
+            padding: 5px;
+        }
+
+        #main {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            margin-top: 40px;
+        }
+
+        #main>div {
+            display: inline-block;
+            margin: 20px;
+            margin-bottom: 40px;
+            overflow-wrap: break-word;
+        }
+
+        article>div {
+            margin-bottom: 20px;
+            display: inline-block;
+            margin: 20px;
+        }
+
+        .card {
+            background-color: #ededed;
+            padding: 20px;
+        }
+
+        .emoji {
+            font-size: 128px;
+            text-align: center;
+        }
+
+        p {
+            margin: 20px;
+        }
+
+        input {
+            width: 80%;
+        }
+    </style>
+    
+</head>
+
+<body>
+    <article>
+        <div>
+            Palette: <select id="color">
+                <option>white, red, blue, yellow</option>
+                <option>green, purple, orange</option>
+                <option selected="selected">mediumblue, gold, white</option>
+                <option>crimson, aquamarine, deeppink</option>
+                <option>fuchsia, greenyellow, lightslategray</option>
+                <option>maroon, tan, steelblue</option>
+            </select>
+        </div>
+        <div>
+            Count: <select id="count">
+                <option>1</option>
+                <option>10</option>
+                <option selected="selected">20</option>
+                <option>30</option>
+                <option>40</option>
+                <option>50</option>
+                <option>60</option>
+                <option>70</option>
+                <option>80</option>
+                <option>90</option>
+                <option>100</option>
+            </select>
+        </div>
+        <div>
+            Scale: <select id="scale">
+                <option>1</option>
+                <option>2</option>
+                <option selected="selected">3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+        </div>
+        <div>
+            Granularity: <select id="granularity">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option selected="selected">4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+            </select>
+        </div>
+        <div>
+            <button class="btn btn-success" onclick="generate(false)">Generate</button>
+            <button class="btn btn-success" onclick="reset()">Reset</button>
+        </div>
+        <div>
+            <a href="https://mathpickle.com/mondrian-art-puzzles-solutions/" target="_new">Mondrian Art Puzzle</a>
+        </div>
+    </article>
+    <article>
+        <div style="width:80%">
+            MondgramDNA: <input type="text" id="mondgramdna" /> <button class="btn btn-success" onclick="render()">Render</button>
+        </div>
+    </article>
+
+    <div id="main"></div>
+
+    <script src="mondgram.js"></script>
+    <script>
+
+        var mondgrams = null;
+        function generate(playback) {
+            let main = document.getElementById('main');
+            reset();
+            if (!playback) {
+                mondgrams = [];
+            }
+            let options = getOptions();
+
+
+            for (let c = 0; c < options.count; c++) {
+
+                let id = 'asset' + String(c);
+                let mdiv = document.createElement('div');
+                mdiv.className = 'card';
+                mdiv.id = id;
+                main.appendChild(mdiv);
+
+                let mondrian = new Mondgram(id, options, playback ? mondgrams[c] : null);
+                let mondgram = mondrian.mondgram();
+
+                let adiv = document.createElement('p');
+                adiv.innerHTML = "<strong>MondgramDNA:</strong> " + mondgram;
+                mdiv.appendChild(adiv);
+
+                let sdiv = document.createElement('p');
+                sdiv.className = 'emoji';
+                sdiv.innerHTML = '&#x' + mondgram.split('&')[1];
+                mdiv.appendChild(sdiv);
+
+                mondgram.id = id;
+                mondgrams.push(mondgram);
+            }
+        }
+
+        function reset() {
+            document.getElementById('main').innerHTML = '';
+        }
+
+        function render() {
+            let dnaEl = document.getElementById('mondgramdna');
+            let dna = dnaEl.value;
+            reset();
+            let mdiv = document.createElement('div');
+            mdiv.id = 'preview';
+            mdiv.className = 'card';
+            document.getElementById('main').appendChild(mdiv);
+            new Mondgram('preview', getOptions(), dna);
+            let sdiv = document.createElement('div');
+            sdiv.className = 'emoji';
+            sdiv.innerHTML = '&#x' + dna.split('&')[1];
+            mdiv.appendChild(sdiv);
+        }
+
+        function getOptions() {
+            let countEl = document.getElementById('count');
+            let count = Number(countEl.options[countEl.selectedIndex].text);
+
+            let scaleEl = document.getElementById('scale');
+            let scale = Number(scaleEl.options[scaleEl.selectedIndex].text);
+
+            let colorEl = document.getElementById('color');
+            let colors = colorEl.options[colorEl.selectedIndex].text.split(',');
+
+            let granularityEl = document.getElementById('granularity');
+            let granularity = granularityEl.options[granularityEl.selectedIndex].text;
+
+            return {
+                count,
+                scale,
+                colors,
+                granularity
+            }
+        }
+
+        generate(false);
+    </script>
+
+
+</body>
+
+</html>
